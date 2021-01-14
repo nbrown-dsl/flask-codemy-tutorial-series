@@ -5,10 +5,11 @@ app.debug = True
 
 @app.route('/')
 def index():
-    title = "Flask starter project"
-    return render_template('index.html', title=title)
+    
+    return render_template('index.html')
 
 @app.route('/about')
 def about():
+    
     names = ["Mr Brown","Turing","Gates"]
     return render_template('about.html',names=names)
