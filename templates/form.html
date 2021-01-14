@@ -6,8 +6,9 @@
 <div class='container'><h1>thanks for subscribing</h1></div>
  <small>Please confirm your information</small> 
  <br><br>
- {{first_name}}  
- {{last_name}}
- {{email}}
-
+ <ul>
+ {% for subscriber in subscribers %}
+ <li>{{ subscriber }}</li>
+ {% endfor %}
+</ul>
 {% endblock %}
