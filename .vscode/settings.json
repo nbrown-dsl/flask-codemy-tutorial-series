@@ -1,4 +1,6 @@
 {
-    "python.pythonPath": "virtualFlask\\Scripts\\python.exe"
+    "python.pythonPath": "virtualFlask\\Scripts\\python.exe",
+    "plantuml.diagramsRoot": "docs/diagrams/src",
+    "plantuml.exportOutDir": "docs/diagrams/out"
     
 }
