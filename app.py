@@ -7,6 +7,7 @@ app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///friends.db'
 #initialize database
 db = SQLAlchemy(app)
+
 #create database model
 class Friend(db.Model):
     id = db.Column(db.Integer, primary_key=True)
