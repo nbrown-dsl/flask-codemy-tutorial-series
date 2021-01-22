@@ -1,7 +1,24 @@
-from flask import Flask,render_template, request
+from flask import Flask,render_template, request, redirect
+from flask_sqlalchemy import SQLAlchemy
+from datetime import datetime
 # import smtplib
 
 app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///friends.db'
+#initialize database
+db = SQLAlchemy(app)
+#create database model
+class Friend(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(200),nullable=False)
+    date_created = db.Column(db.DateTime, default = datetime.utcnow)
+
+    #create function to return stringwhen we add something
+    def __repr__(self):
+        return '<Name %r>' % self.id
+
+
+
 subscribers = []
 
 @app.route('/')
@@ -14,6 +31,24 @@ def about():
     
     names = ["Mr Brown","Turing","Gates"]
     return render_template('about.html',names=names)
+
+@app.route('/friends' , methods=["POST","GET"])
+def friends():
+    
+    title = "my friends"
+    if request.method == "POST":
+        friend_name = request.form['name']
+        new_friend = Friend(name=friend_name)
+        #push to databse
+        try:
+            db.session.add(new_friend)
+            db.session.commit()
+            return redirect('/friends')
+        except:
+            return "there was error adding your friend"
+    else:
+        friends = Friend.query.order_by(Friend.date_created)
+        return render_template('friends.html',title=title, friends = friends)
 
 @app.route('/subscribe')
 def subscribe():
