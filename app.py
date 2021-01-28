@@ -22,6 +22,18 @@ class Friend(db.Model):
 
 subscribers = []
 
+@app.route('/delete/<int:id>')
+def delete(id):
+    friend_to_delete = Friend.query.get_or_404(id)
+    
+    try:
+        db.session.delete(friend_to_delete)
+        db.session.commit()
+        return redirect('/friends')
+    except:
+        return "there was a problem"
+
+
 @app.route('/update/<int:id>', methods=["POST","GET"])
 def update(id):
     friend_to_update = Friend.query.get_or_404(id)
@@ -31,7 +43,7 @@ def update(id):
             db.session.commit()
             return redirect('/friends')
         except:
-                return "problem updating"
+            return "problem updating"
     else:
         return render_template('update.html', friend_to_update=friend_to_update)
 
