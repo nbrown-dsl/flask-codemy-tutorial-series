@@ -27,7 +27,8 @@ class Group(db.Model):
     def __repr__(self):
         return '<Name %r>' % self.id
 
-
+db.create_all()
+db.session.commit()
 
 subscribers = []
 
@@ -67,24 +68,40 @@ def about():
     names = ["Mr Brown","Turing","Gates"]
     return render_template('about.html',names=names)
 
-@app.route('/friends/' , defaults={'modelName':'friend'})
+@app.route('/friends/' , defaults={'modelName':'friend'}, methods=["POST","GET"])
 @app.route('/friends/<modelName>' , methods=["POST","GET"])
 def friends(modelName):
     
     title = modelName
-    if request.method == "POST":
-        friend_name = request.form['name']
-        new_friend = Friend(name=friend_name)
-        #push to databse
-        try:
-            db.session.add(new_friend)
-            db.session.commit()
-            return redirect('/friends')
-        except:
-            return "there was error adding your friend"
+    if title == "Friends":
+        if request.method == "POST":
+            friend_name = request.form['name']
+            new_friend = Friend(name=friend_name)
+            #push to databse
+            try:
+                db.session.add(new_friend)
+                db.session.commit()
+                return redirect('/friends')
+            except:
+                return "there was error adding your friend"
+        else:
+            friends = Friend.query.order_by(Friend.date_created)
+            return render_template('friends.html',title=title, friends = friends)
     else:
-        friends = Friend.query.order_by(Friend.date_created)
-        return render_template('friends.html',title=title, friends = friends)
+        if request.method == "POST":
+            friend_name = request.form['name']
+            new_friend = Group(name=friend_name)
+            #push to databse
+            try:
+                db.session.add(new_friend)
+                db.session.commit()
+                groups = Group.query.order_by(Group.date_created)
+                return render_template('friends.html',title=title, friends = groups)
+            except:
+                return "there was error adding the group"
+        else:
+            groups = Group.query.order_by(Group.date_created)
+            return render_template('friends.html',title=title, friends = groups)
 
 @app.route('/subscribe')
 def subscribe():
