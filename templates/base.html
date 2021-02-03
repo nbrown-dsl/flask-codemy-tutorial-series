@@ -31,7 +31,10 @@
                 <a class="nav-link" href="{{ url_for('subscribe')}}">Subscribe</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="{{ url_for('friends')}}">Friends</a>
+                <a class="nav-link" href="{{ url_for('friends', modelName='Friends')}}">Friends</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('friends', modelName='Groups')}}">Groups</a>
               </li>
               <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">

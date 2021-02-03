@@ -18,6 +18,15 @@ class Friend(db.Model):
     def __repr__(self):
         return '<Name %r>' % self.id
 
+class Group(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(200),nullable=False)
+    date_created = db.Column(db.DateTime, default = datetime.utcnow)
+
+    #create function to return stringwhen we add something
+    def __repr__(self):
+        return '<Name %r>' % self.id
+
 
 
 subscribers = []
@@ -58,10 +67,11 @@ def about():
     names = ["Mr Brown","Turing","Gates"]
     return render_template('about.html',names=names)
 
-@app.route('/friends' , methods=["POST","GET"])
-def friends():
+@app.route('/friends/' , defaults={'modelName':'friend'})
+@app.route('/friends/<modelName>' , methods=["POST","GET"])
+def friends(modelName):
     
-    title = "my friends"
+    title = modelName
     if request.method == "POST":
         friend_name = request.form['name']
         new_friend = Friend(name=friend_name)
