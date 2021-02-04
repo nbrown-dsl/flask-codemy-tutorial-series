@@ -32,14 +32,17 @@ db.session.commit()
 
 subscribers = []
 
-@app.route('/delete/<int:id>')
-def delete(id):
-    friend_to_delete = Friend.query.get_or_404(id)
-    
+@app.route('/delete/<int:id>/<modelName>')
+def delete(id,modelName):
+    if modelName == 'Friends':
+        record_to_delete = Friend.query.get_or_404(id)
+    if modelName == 'Groups':
+        record_to_delete = Group.query.get_or_404(id)
+        
     try:
-        db.session.delete(friend_to_delete)
+        db.session.delete(record_to_delete)
         db.session.commit()
-        return redirect('/friends')
+        return redirect(url_for('friends', modelName=modelName))
     except:
         return "there was a problem"
 
