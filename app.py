@@ -1,9 +1,9 @@
-from flask import Flask,render_template, request, redirect
+from flask import Flask,render_template, request, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 # import smtplib
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder="templates")
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///friends.db'
 #initialize database
 db = SQLAlchemy(app)
@@ -44,18 +44,21 @@ def delete(id):
         return "there was a problem"
 
 
-@app.route('/update/<int:id>', methods=["POST","GET"])
-def update(id):
-    friend_to_update = Friend.query.get_or_404(id)
+@app.route('/update/<int:id>/<modelName>', methods=["POST","GET"])
+def update(id,modelName):
+    if modelName == 'Friends':
+        record_to_update = Friend.query.get_or_404(id)
+    if modelName == 'Groups':
+        record_to_update = Group.query.get_or_404(id)
     if request.method == "POST":
-        friend_to_update.name = request.form['name'] 
+        record_to_update.name = request.form['name'] 
         try:
             db.session.commit()
-            return redirect('/friends')
+            return redirect(url_for('friends', modelName=modelName))
         except:
             return "problem updating"
     else:
-        return render_template('update.html', friend_to_update=friend_to_update)
+        return render_template('update.html', friend_to_update=record_to_update,modelName=modelName)
 
 @app.route('/')
 def index():
@@ -68,12 +71,11 @@ def about():
     names = ["Mr Brown","Turing","Gates"]
     return render_template('about.html',names=names)
 
-@app.route('/friends/' , defaults={'modelName':'friend'}, methods=["POST","GET"])
 @app.route('/friends/<modelName>' , methods=["POST","GET"])
 def friends(modelName):
     
     title = modelName
-    if title == "Friends":
+    if modelName == "Friends":
         if request.method == "POST":
             friend_name = request.form['name']
             new_friend = Friend(name=friend_name)
@@ -81,12 +83,13 @@ def friends(modelName):
             try:
                 db.session.add(new_friend)
                 db.session.commit()
-                return redirect('/friends')
+                friends = Friend.query.order_by(Friend.date_created)
+                return render_template('friends.html',title=title, friends = friends, modelName = modelName)
             except:
                 return "there was error adding your friend"
         else:
             friends = Friend.query.order_by(Friend.date_created)
-            return render_template('friends.html',title=title, friends = friends)
+            return render_template('friends.html',title=title, friends = friends, modelName = modelName)
     else:
         if request.method == "POST":
             friend_name = request.form['name']
@@ -96,12 +99,12 @@ def friends(modelName):
                 db.session.add(new_friend)
                 db.session.commit()
                 groups = Group.query.order_by(Group.date_created)
-                return render_template('friends.html',title=title, friends = groups)
+                return render_template('friends.html',title=title, friends = groups, modelName = modelName)
             except:
                 return "there was error adding the group"
         else:
             groups = Group.query.order_by(Group.date_created)
-            return render_template('friends.html',title=title, friends = groups)
+            return render_template('friends.html',title=title, friends = groups, modelName = modelName)
 
 @app.route('/subscribe')
 def subscribe():
