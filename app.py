@@ -1,12 +1,18 @@
 from flask import Flask,render_template, request, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
+from wtforms_alchemy import ModelForm
 # import smtplib
 
 app = Flask(__name__, template_folder="templates")
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///friends.db'
 #initialize database
 db = SQLAlchemy(app)
+
+HOUR_CHOICES = [('1', '8am'), ('2', '10am')]
+
+class TestForm(ModelForm):
+     hour = SelectField(u'Hour', choices=HOUR_CHOICES)
 
 #create database model
 class Friend(db.Model):
