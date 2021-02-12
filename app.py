@@ -1,7 +1,8 @@
 from flask import Flask,render_template, request, redirect, url_for
-from flask_sqlalchemy import SQLAlchemy
+from flask_sqlalchemy import SQLAlchemy 
 from datetime import datetime
-from wtforms_alchemy import ModelForm
+
+
 # import smtplib
 
 app = Flask(__name__, template_folder="templates")
@@ -9,27 +10,28 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///friends.db'
 #initialize database
 db = SQLAlchemy(app)
 
-HOUR_CHOICES = [('1', '8am'), ('2', '10am')]
 
-class TestForm(ModelForm):
-     hour = SelectField(u'Hour', choices=HOUR_CHOICES)
+
+
 
 #create database model
 class Friend(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(200),nullable=False)
+    gender = db.Column(db.String(200),nullable=True)
     date_created = db.Column(db.DateTime, default = datetime.utcnow)
-
-    #create function to return stringwhen we add something
+    
+    # create function to return string when we add something
     def __repr__(self):
         return '<Name %r>' % self.id
+
 
 class Group(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(200),nullable=False)
     date_created = db.Column(db.DateTime, default = datetime.utcnow)
 
-    #create function to return stringwhen we add something
+    #create function to return string when we add something
     def __repr__(self):
         return '<Name %r>' % self.id
 
@@ -37,6 +39,8 @@ db.create_all()
 db.session.commit()
 
 subscribers = []
+
+
 
 @app.route('/delete/<int:id>/<modelName>')
 def delete(id,modelName):
@@ -87,7 +91,8 @@ def friends(modelName):
     if modelName == "Friends":
         if request.method == "POST":
             friend_name = request.form['name']
-            new_friend = Friend(name=friend_name)
+            friend_gender = request.form['gender']
+            new_friend = Friend(name=friend_name,gender=friend_gender)
             #push to databse
             try:
                 db.session.add(new_friend)
@@ -98,6 +103,7 @@ def friends(modelName):
                 return "there was error adding your friend"
         else:
             friends = Friend.query.order_by(Friend.date_created)
+            
             return render_template('friends.html',title=title, friends = friends, modelName = modelName)
     else:
         if request.method == "POST":
