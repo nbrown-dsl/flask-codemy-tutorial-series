@@ -9,23 +9,28 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///friends.db'
 db = SQLAlchemy(app)
 
 #create database model
-class Friend(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(200),nullable=False)
-    date_created = db.Column(db.DateTime, default = datetime.utcnow)
-
-    #create function to return stringwhen we add something
-    def __repr__(self):
-        return '<Name %r>' % self.id
-
 class Group(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(200),nullable=False)
     date_created = db.Column(db.DateTime, default = datetime.utcnow)
+    people = db.relationship('Friend', backref='group', lazy=True)
+
+    #create function to return string when we add something
+    def __repr__(self):
+        return '<Name %r>' % self.id
+
+class Friend(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(200),nullable=False)
+    date_created = db.Column(db.DateTime, default = datetime.utcnow)
+    group_id = db.Column(db.Integer, db.ForeignKey('group.id'),
+        nullable=True)
 
     #create function to return stringwhen we add something
     def __repr__(self):
         return '<Name %r>' % self.id
+
+
 
 db.create_all()
 db.session.commit()
@@ -81,18 +86,17 @@ def friends(modelName):
     if modelName == "Friends":
         if request.method == "POST":
             friend_name = request.form['name']
-            new_friend = Friend(name=friend_name)
+            friend_group = request.form['group']
+            new_friend = Friend(name=friend_name, group_id=friend_group)
             #push to databse
             try:
                 db.session.add(new_friend)
                 db.session.commit()
-                friends = Friend.query.order_by(Friend.date_created)
-                return render_template('friends.html',title=title, friends = friends, modelName = modelName)
+                
             except:
                 return "there was error adding your friend"
-        else:
-            friends = Friend.query.order_by(Friend.date_created)
-            return render_template('friends.html',title=title, friends = friends, modelName = modelName)
+            
+    #if group update
     else:
         if request.method == "POST":
             friend_name = request.form['name']
@@ -101,13 +105,12 @@ def friends(modelName):
             try:
                 db.session.add(new_friend)
                 db.session.commit()
-                groups = Group.query.order_by(Group.date_created)
-                return render_template('friends.html',title=title, friends = groups, modelName = modelName)
             except:
                 return "there was error adding the group"
-        else:
-            groups = Group.query.order_by(Group.date_created)
-            return render_template('friends.html',title=title, friends = groups, modelName = modelName)
+
+    friends = Friend.query.order_by(Friend.date_created)
+    groups = Group.query.order_by(Group.date_created)
+    return render_template('friends.html',title=title, friends = friends, groups = groups, modelName = modelName)
 
 @app.route('/subscribe')
 def subscribe():

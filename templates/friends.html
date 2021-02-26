@@ -7,15 +7,34 @@
     
     <br>
 <form action="/friends/{{modelName}}" METHOD = "POST">
-    <input type="text" placeholder = "name" name = "name">
+    <input type="text" placeholder = "name" name = "name"><br>
+    {% if modelName == 'Friends' %}
+    <label for="group">Group</label>
+      <select id="group" class="form-control" name="group">
+        <option selected>Choose...</option>
+        {% for group in groups %}
+        <option >{{ group.name }}</option>
+        {% endfor %}
+      </select>
+    {% endif %}
+      <br>
     <input type="submit" value="add name" class="btn btn-secondary">
 </form>
  <br><br>
- {% for friend in friends %}
- <h4> {{friend.name }} <a href="/update/{{friend.id }}/{{modelName}}" class="btn btn-secondary btn-sm">update</a>
-  <a href="/delete/{{friend.id }}/{{modelName}}" class="btn btn-outline-danger btn-sm">delete</a>
-</h4>
- {% endfor %}
+ {% if modelName == 'Friends' %}
+      {% for friend in friends %}
+      <h4> {{friend.name }} <a href="/update/{{friend.id }}/{{modelName}}" class="btn btn-secondary btn-sm">update</a>
+        <a href="/delete/{{friend.id }}/{{modelName}}" class="btn btn-outline-danger btn-sm">delete</a>
+      </h4>
+      {% endfor %}
+  {% else %}
+      {% for group in groups %}
+      <h4> {{group.name }} <a href="/update/{{group.id }}/{{modelName}}" class="btn btn-secondary btn-sm">update</a>
+        <a href="/delete/{{group.id }}/{{modelName}}" class="btn btn-outline-danger btn-sm">delete</a>
+      </h4>
+      {% endfor %}
+
+ {% endif %}
     </div>
     
 
