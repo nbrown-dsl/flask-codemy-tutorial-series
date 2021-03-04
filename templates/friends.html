@@ -3,7 +3,7 @@
 {% block content %}
 
 
-      <div class='container'><h1>{{title}}</h1>
+      <div class='container'><h1>{{modelName}}</h1>
     
     <br>
 <form action="/friends/{{modelName}}" METHOD = "POST">
@@ -20,6 +20,7 @@
       <br>
     <input type="submit" value="add name" class="btn btn-secondary">
 </form>
+
  <br><br>
  {% if modelName == 'Friends' %}
       {% for friend in friends %}

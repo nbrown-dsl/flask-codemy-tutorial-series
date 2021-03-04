@@ -97,16 +97,19 @@ def friends(modelName):
                 return "there was error adding your friend"
             
     #if group update
-    else:
+    elif modelName == "Groups":
         if request.method == "POST":
-            friend_name = request.form['name']
-            new_friend = Group(name=friend_name)
+            group_name = request.form['name']
+            new_group = Group(name=group_name)
             #push to databse
             try:
-                db.session.add(new_friend)
+                db.session.add(new_group)
                 db.session.commit()
             except:
                 return "there was error adding the group"
+
+    else:
+        print("modelname not known") 
 
     friends = Friend.query.order_by(Friend.date_created)
     groups = Group.query.order_by(Group.date_created)
