@@ -88,7 +88,7 @@ def friends(modelName):
             friend_name = request.form['name']
             friend_group = request.form['group']
             new_friend = Friend(name=friend_name, group_id=friend_group)
-            #push to databse
+            #push to database
             try:
                 db.session.add(new_friend)
                 db.session.commit()

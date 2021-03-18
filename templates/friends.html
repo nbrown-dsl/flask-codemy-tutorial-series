@@ -13,7 +13,7 @@
       <select id="group" class="form-control" name="group">
         <option selected>Choose...</option>
         {% for group in groups %}
-        <option >{{ group.name }}</option>
+        <option value = "{{ group.id }}">{{ group.name }}</option>
         {% endfor %}
       </select>
     {% endif %}
