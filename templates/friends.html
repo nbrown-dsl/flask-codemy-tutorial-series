@@ -22,20 +22,31 @@
 </form>
 
  <br><br>
+ <table>
  {% if modelName == 'Friends' %}
-      {% for friend in friends %}
-      <h4> {{friend.name }} <a href="/update/{{friend.id }}/{{modelName}}" class="btn btn-secondary btn-sm">update</a>
-        <a href="/delete/{{friend.id }}/{{modelName}}" class="btn btn-outline-danger btn-sm">delete</a>
-      </h4>
+    <th>Name</th>
+    <th>Group</th>
+    {% for friend in friends %}
+    <tr> 
+       <td><h4> {{friend.name }}</h4></td>
+       <td> {{friend.group.name}}</td>
+       <td><a href="/update/{{friend.id }}/{{modelName}}" class="btn btn-secondary btn-sm">Update</a></td>
+       <td><a href="/delete/{{friend.id }}/{{modelName}}" class="btn btn-outline-danger btn-sm">Delete</a></td>
+    </tr>
       {% endfor %}
   {% else %}
+      <th>Name</th>
       {% for group in groups %}
-      <h4> {{group.name }} <a href="/update/{{group.id }}/{{modelName}}" class="btn btn-secondary btn-sm">update</a>
-        <a href="/delete/{{group.id }}/{{modelName}}" class="btn btn-outline-danger btn-sm">delete</a>
-      </h4>
+      <tr> 
+        <td><h4> {{group.name }}</h4></td>
+        <td><a href="/update/{{group.id }}/{{modelName}}" class="btn btn-secondary btn-sm">Update</a></td>
+        <td><a href="/delete/{{group.id }}/{{modelName}}" class="btn btn-outline-danger btn-sm">Delete</a></td>
+     </tr>
       {% endfor %}
 
  {% endif %}
+</table>
+
     </div>
     
 

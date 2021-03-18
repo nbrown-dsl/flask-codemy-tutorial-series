@@ -8,7 +8,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///friends.db'
 #initialize database
 db = SQLAlchemy(app)
 
-#create database model
+#create model class that can be mapped to database
 class Group(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(200),nullable=False)
@@ -26,7 +26,7 @@ class Friend(db.Model):
     group_id = db.Column(db.Integer, db.ForeignKey('group.id'),
         nullable=True)
 
-    #create function to return stringwhen we add something
+    #create function to return string when we create new instance
     def __repr__(self):
         return '<Name %r>' % self.id
 
