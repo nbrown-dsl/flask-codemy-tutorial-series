@@ -54,19 +54,22 @@ def delete(id,modelName):
 
 @app.route('/update/<int:id>/<modelName>', methods=["POST","GET"])
 def update(id,modelName):
+    groups = Group.query.order_by(Group.date_created)
     if modelName == 'Friends':
         record_to_update = Friend.query.get_or_404(id)
     if modelName == 'Groups':
         record_to_update = Group.query.get_or_404(id)
     if request.method == "POST":
         record_to_update.name = request.form['name'] 
+        if modelName == 'Friends':
+            record_to_update.group_id = request.form['group'] 
         try:
             db.session.commit()
             return redirect(url_for('friends', modelName=modelName))
         except:
             return "problem updating"
     else:
-        return render_template('update.html', friend_to_update=record_to_update,modelName=modelName)
+        return render_template('update.html', friend_to_update=record_to_update,modelName=modelName, groups = groups)
 
 @app.route('/')
 def index():

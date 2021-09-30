@@ -11,7 +11,7 @@
     {% if modelName == 'Friends' %}
     <label for="group">Group</label>
       <select id="group" class="form-control" name="group">
-        <option selected>Choose...</option>
+        <option selected>Choose group...</option>
         {% for group in groups %}
         <option value = "{{ group.id }}">{{ group.name }}</option>
         {% endfor %}
@@ -38,11 +38,20 @@
       <th>Name</th>
       {% for group in groups %}
       <tr> 
-        <td><h4> {{group.name }}</h4></td>
-        <td><a href="/update/{{group.id }}/{{modelName}}" class="btn btn-secondary btn-sm">Update</a></td>
-        <td><a href="/delete/{{group.id }}/{{modelName}}" class="btn btn-outline-danger btn-sm">Delete</a></td>
-     </tr>
+        <td><h4> {{group.name }}</h4> </td>
+        <td><a href="/update/{{group.id }}/{{modelName}}" class="btn btn-secondary btn-sm">Update</a></td>&nbsp;
+        <td><a href="/delete/{{group.id }}/{{modelName}}" class="btn btn-outline-danger btn-sm">Delete</a></td>&nbsp;
+        <td><p>
+          {% if group.people[0] %}
+            Members:
+            {% for friend in group.people %}
+            {{friend.name}},
+            {% endfor %}
+          {% endif %}
+        </p></td>
+      </tr>
       {% endfor %}
+      
 
  {% endif %}
 </table>

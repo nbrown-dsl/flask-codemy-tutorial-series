@@ -7,7 +7,16 @@
     <h1>Update {{modelName}}</h1>    
 <br>
 <form action="/update/{{friend_to_update.id}}/{{modelName}}" METHOD = "POST">
-    <input type="text" placeholder = "name" name = "name" value = "{{friend_to_update.name}}">
+    <input type="text" placeholder = "name" name = "name" value = "{{friend_to_update.name}}"><br>
+    {% if modelName == 'Friends' %}
+    <label for="group">Group</label>
+      <select id="group" class="form-control" name="group">
+        <option selected>{{friend_to_update.group.name}}</option>
+        {% for group in groups %}
+        <option value = "{{ group.id }}">{{ group.name }}</option>
+        {% endfor %}
+      </select>
+    {% endif %}<br>
     <input type="submit" value="update name" class="btn btn-secondary">
 </form>
 <div>
