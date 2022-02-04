@@ -1,5 +1,7 @@
 from flask import Flask,render_template, request, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.orm import relationship, backref
+
 from datetime import datetime
 # import smtplib
 
@@ -8,11 +10,11 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///friends.db'
 #initialize database
 db = SQLAlchemy(app)
 
-#create helper table between many to many relationship
-helper = db.Table('helper',
-    db.Column('friend_id', db.Integer, db.ForeignKey('Friend.id'), primary_key=True),
-    db.Column('class_id', db.Integer, db.ForeignKey('Class.id'), primary_key=True)
-)
+# #create helper table between many to many relationship
+# helper = db.Table('helper',
+#     db.Column('friend_id', db.Integer, db.ForeignKey('Friend.id'), primary_key=True),
+#     db.Column('class_id', db.Integer, db.ForeignKey('Class.id'), primary_key=True)
+# )
 
 #create model class that can be mapped to database
 class Group(db.Model):
@@ -31,24 +33,37 @@ class Friend(db.Model):
     date_created = db.Column(db.DateTime, default = datetime.utcnow)
     group_id = db.Column(db.Integer, db.ForeignKey('group.id'),
         nullable=True)
-    classes = db.relationship("Class",
-                    secondary=helper)
+    
+    classes = db.relationship('ClassForm',
+                    secondary='rolls')
     #create function to return string when we create new instance
     def __repr__(self):
         return '<Name %r>' % self.id
 
-class Class(db.Model):
+class ClassForm(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     subject = db.Column(db.String(200),nullable=False)
     teacher = db.Column(db.String(200),nullable=False)    
-    group_id = db.Column(db.Integer, db.ForeignKey('group.id'),
+    friend_id = db.Column(db.Integer, db.ForeignKey('friend.id'),
         nullable=True)
+
+    friends = db.relationship('Friend',
+                    secondary='rolls')
 
     #create function to return string when we create new instance
     def __repr__(self):
         return '<Name %r>' % self.id
 
 
+
+class Roll(db.Model):
+    __tablename__ = 'rolls'
+    id = db.Column(db.Integer, primary_key=True)
+    classform_id = db.Column(db.Integer, db.ForeignKey('class_form.id'))
+    friend_id = db.Column(db.Integer, db.ForeignKey('friend.id'))
+
+    friend = relationship(Friend, backref=backref("rolls", cascade="all, delete-orphan"))
+    classform = relationship(ClassForm, backref=backref("rolls", cascade="all, delete-orphan"))
 
 db.create_all()
 db.session.commit()
