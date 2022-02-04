@@ -8,6 +8,9 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///friends.db'
 #initialize database
 db = SQLAlchemy(app)
 
+app.run(debug=True)
+
+
 #create model class that can be mapped to database
 class Group(db.Model):
     id = db.Column(db.Integer, primary_key=True)
