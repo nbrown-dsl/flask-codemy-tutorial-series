@@ -128,7 +128,7 @@ def friends(modelName):
             except:
                 return "there was error adding your friend"
             
-    #if group update
+    #if group add
     elif modelName == "Groups":
         if request.method == "POST":
             group_name = request.form['name']
@@ -140,7 +140,7 @@ def friends(modelName):
             except Exception as e:    
                 return print(e) 
 
-    #if class update
+    #if class add
     elif modelName == "ClassForm":
         if request.method == "POST":
             class_name = request.form['name']
