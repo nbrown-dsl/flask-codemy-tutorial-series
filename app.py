@@ -10,11 +10,6 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///friends.db'
 #initialize database
 db = SQLAlchemy(app)
 
-# #create helper table between many to many relationship
-# helper = db.Table('helper',
-#     db.Column('friend_id', db.Integer, db.ForeignKey('Friend.id'), primary_key=True),
-#     db.Column('class_id', db.Integer, db.ForeignKey('Class.id'), primary_key=True)
-# )
 
 #create model class that can be mapped to database
 class Group(db.Model):
@@ -42,11 +37,9 @@ class Friend(db.Model):
 
 class ClassForm(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(200),nullable=False)
     subject = db.Column(db.String(200),nullable=False)
     teacher = db.Column(db.String(200),nullable=False)    
-    friend_id = db.Column(db.Integer, db.ForeignKey('friend.id'),
-        nullable=True)
-
     friends = db.relationship('Friend',
                     secondary='rolls')
 
@@ -54,8 +47,7 @@ class ClassForm(db.Model):
     def __repr__(self):
         return '<Name %r>' % self.id
 
-
-
+# helper table to create many to many relationship between friend and classform
 class Roll(db.Model):
     __tablename__ = 'rolls'
     id = db.Column(db.Integer, primary_key=True)
@@ -76,6 +68,8 @@ def delete(id,modelName):
         record_to_delete = Friend.query.get_or_404(id)
     if modelName == 'Groups':
         record_to_delete = Group.query.get_or_404(id)
+    if modelName == 'ClassForm':
+        record_to_delete = ClassForm.query.get_or_404(id)
         
     try:
         db.session.delete(record_to_delete)
@@ -92,6 +86,8 @@ def update(id,modelName):
         record_to_update = Friend.query.get_or_404(id)
     if modelName == 'Groups':
         record_to_update = Group.query.get_or_404(id)
+    if modelName == 'ClassForm':
+        record_to_update = ClassForm.query.get_or_404(id)
     if request.method == "POST":
         record_to_update.name = request.form['name'] 
         if modelName == 'Friends':
@@ -141,15 +137,30 @@ def friends(modelName):
             try:
                 db.session.add(new_group)
                 db.session.commit()
+            except Exception as e:    
+                return print(e) 
+
+    #if class update
+    elif modelName == "ClassForm":
+        if request.method == "POST":
+            class_name = request.form['name']
+            class_subject = request.form['subject']
+            class_teacher = request.form['teacher']
+            new_class = ClassForm(name=class_name, subject=class_subject, teacher=class_teacher)
+            #push to databse
+            try:
+                db.session.add(new_class)
+                db.session.commit()
             except:
-                return "there was error adding the group"
+                return "there was error adding the class"
 
     else:
         print("modelname not known") 
 
     friends = Friend.query.order_by(Friend.date_created)
     groups = Group.query.order_by(Group.date_created)
-    return render_template('friends.html',title=title, friends = friends, groups = groups, modelName = modelName)
+    classes = ClassForm.query.order_by(ClassForm.subject)
+    return render_template('friends.html',title=title, friends = friends, groups = groups, classes = classes, modelName = modelName)
 
 @app.route('/subscribe')
 def subscribe():
