@@ -82,23 +82,41 @@ def delete(id,modelName):
 @app.route('/update/<int:id>/<modelName>', methods=["POST","GET"])
 def update(id,modelName):
     groups = Group.query.order_by(Group.date_created)
+    classes = ClassForm.query.order_by(ClassForm.subject)
+    
     if modelName == 'Friends':
         record_to_update = Friend.query.get_or_404(id)
+        enrollments = Roll.query.filter_by(friend_id=id)
+        enrollment_ids = []
+        #create list of class ids that friend is enrolled on
+        for enroll in enrollments:
+            enrollment_ids.append(enroll.classform_id)
     if modelName == 'Groups':
         record_to_update = Group.query.get_or_404(id)
     if modelName == 'ClassForm':
         record_to_update = ClassForm.query.get_or_404(id)
+
     if request.method == "POST":
         record_to_update.name = request.form['name'] 
         if modelName == 'Friends':
             record_to_update.group_id = request.form['group'] 
+            #delete previous enrollments
+            enrollments = Roll.query.filter_by(friend_id=id)
+            for enrollment in enrollments:
+                db.session.delete(enrollment)
+                db.session.commit()
+            friend_classes = request.form.getlist("class")
+            #iterates through list of checked checkboxes, adding to roll
+            for friendClass in friend_classes:
+                new_enrollment=Roll(friend_id=id, classform_id=friendClass)
+                db.session.add(new_enrollment)
         try:
             db.session.commit()
             return redirect(url_for('friends', modelName=modelName))
         except:
             return "problem updating"
     else:
-        return render_template('update.html', friend_to_update=record_to_update,modelName=modelName, groups = groups)
+        return render_template('update.html', friend_to_update=record_to_update,modelName=modelName, groups = groups, classes = classes, enrollments=enrollment_ids)
 
 @app.route('/')
 def index():
@@ -124,9 +142,17 @@ def friends(modelName):
             try:
                 db.session.add(new_friend)
                 db.session.commit()
-                
+
+                friend_classes = request.form.getlist('class')
+                #iterates through list of checked checkboxes, adding to roll
+                for friendClass in friend_classes:
+                    new_enrollment=Roll(friend_id=new_friend.id, classform_id=friendClass)
+                    db.session.add(new_enrollment)
+                    db.session.commit()
             except:
                 return "there was error adding your friend"
+
+            
             
     #if group add
     elif modelName == "Groups":

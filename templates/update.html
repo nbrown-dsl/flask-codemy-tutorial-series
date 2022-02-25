@@ -17,7 +17,24 @@
         {% endfor %}
       </select>
     {% endif %}<br>
-    <input type="submit" value="update name" class="btn btn-secondary">
+    <label>Classes</label>    
+        {% for class in classes %}
+        <div class="form-check">
+          {% if class.id in enrollments %}
+          <input name="class" class="form-check-input" type="checkbox" value="{{ class.id }}" id="flexCheckDefault" checked>
+          <label class="form-check-label" for="flexCheckDefault">
+            {{ class.name }}
+          </label>
+          {% else %}
+          <input name="class" class="form-check-input" type="checkbox" value="{{ class.id }}" id="flexCheckDefault">
+          <label class="form-check-label" for="flexCheckDefault">
+            {{ class.name }}
+          </label>
+          {% endif %}
+        </div>
+        {% endfor %}
+        <br>
+    <input type="submit" value="Update" class="btn btn-primary">
 </form>
 <div>
 {% endblock %}
