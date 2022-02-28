@@ -1,11 +1,17 @@
 from flask import Flask,render_template, request, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import relationship, backref
-
+import os
+from werkzeug.utils import secure_filename
 from datetime import datetime
-# import smtplib
+
+UPLOAD_FOLDER = 'static/uploads'
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
 app = Flask(__name__, template_folder="templates")
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///friends.db'
 #initialize database
 db = SQLAlchemy(app)
@@ -89,6 +95,8 @@ def update(id,modelName):
         enrollments = Roll.query.filter_by(friend_id=id)
         enrollment_ids = []
         #create list of class ids that friend is enrolled on
+        #when check boxes generated on web page each id is checked against this list
+        #if on list then checkbox checked
         for enroll in enrollments:
             enrollment_ids.append(enroll.classform_id)
     if modelName == 'Groups':
@@ -151,15 +159,25 @@ def friends(modelName):
                     db.session.commit()
             except:
                 return "there was error adding your friend"
-
-            
-            
+           
     #if group add
     elif modelName == "Groups":
         if request.method == "POST":
             group_name = request.form['name']
+            if 'file' not in request.files:
+                # flash('No file part')
+                return redirect(request.url)
+            file = request.files['file']
+            # If the user does not select a file, the browser submits an
+            # empty file without a filename.
+            if file.filename == '':
+                # flash('No selected file')
+                return redirect(request.url)
+            if file and allowed_file(file.filename):
+                filename = secure_filename(file.filename)
+                file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
             new_group = Group(name=group_name)
-            #push to databse
+                #push to databse
             try:
                 db.session.add(new_group)
                 db.session.commit()
@@ -217,3 +235,8 @@ def form():
     subscribers.append(f"{first_name} {last_name} | {email}")
     
     return render_template('form.html', subscribers = subscribers)
+
+
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
