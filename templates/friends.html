@@ -4,7 +4,7 @@
 
 
       <div class='container'><h1>{{modelName}}</h1>
-    
+
     <br>
 <form action="/friends/{{modelName}}" METHOD = "POST" enctype=multipart/form-data>
     <input type="text" placeholder = "name" name = "name"><br>
@@ -58,9 +58,10 @@
   {% endif %}
 
   {% if modelName == 'Groups' %}
-      <th>Name</th>
+      
       {% for group in groups %}
-      <tr> 
+      <tr>
+        <td><img src="{{url_for('static', filename='/uploads/'+group.filename)}}" width="100px"></td> 
         <td><h4> {{group.name }}</h4> </td>
         <td><a href="/update/{{group.id }}/{{modelName}}" class="btn btn-secondary btn-sm">Update</a></td>&nbsp;
         <td><a href="/delete/{{group.id }}/{{modelName}}" class="btn btn-outline-danger btn-sm">Delete</a></td>&nbsp;

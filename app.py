@@ -1,4 +1,4 @@
-from flask import Flask,render_template, request, redirect, url_for
+from flask import Flask,render_template, request, redirect, url_for, send_from_directory
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import relationship, backref
 import os
@@ -23,6 +23,7 @@ class Group(db.Model):
     name = db.Column(db.String(200),nullable=False)
     date_created = db.Column(db.DateTime, default = datetime.utcnow)
     people = db.relationship('Friend', backref='group', lazy=True)
+    filename = db.Column(db.String(200),nullable=True)
 
     #create function to return string when we add something
     def __repr__(self):
@@ -176,7 +177,7 @@ def friends(modelName):
             if file and allowed_file(file.filename):
                 filename = secure_filename(file.filename)
                 file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            new_group = Group(name=group_name)
+            new_group = Group(name=group_name, filename=filename)
                 #push to databse
             try:
                 db.session.add(new_group)
@@ -240,3 +241,8 @@ def form():
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+@app.route('/uploads/<filename>')
+def uploaded_file(filename):
+    return send_from_directory(app.config['UPLOAD_FOLDER'],
+                               filename)
