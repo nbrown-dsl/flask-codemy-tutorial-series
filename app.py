@@ -90,18 +90,16 @@ def delete(id,modelName):
 def update(id,modelName):
     groups = Group.query.order_by(Group.date_created)
     classes = ClassForm.query.order_by(ClassForm.subject)
-    
+    enrollment_ids = []
+
     if modelName == 'Friends':
         record_to_update = Friend.query.get_or_404(id)
-        enrollments = Roll.query.filter_by(friend_id=id)
-        enrollment_ids = []
+        enrollments = Roll.query.filter_by(friend_id=id)        
         #create list of class ids that friend is enrolled on
         #when check boxes generated on web page each id is checked against this list
         #if on list then checkbox checked
         for enroll in enrollments:
             enrollment_ids.append(enroll.classform_id)
-        return render_template('update.html', friend_to_update=record_to_update,modelName=modelName, groups = groups, classes = classes, enrollments=enrollment_ids)
-
     if modelName == 'Groups':
         record_to_update = Group.query.get_or_404(id)
     if modelName == 'ClassForm':
@@ -121,13 +119,16 @@ def update(id,modelName):
             for friendClass in friend_classes:
                 new_enrollment=Roll(friend_id=id, classform_id=friendClass)
                 db.session.add(new_enrollment)
+        
+        
+        
         try:
             db.session.commit()
             return redirect(url_for('friends', modelName=modelName))
         except:
             return "problem updating"
     else:
-        return render_template('update.html', friend_to_update=record_to_update,modelName=modelName, groups = groups, classes = classes)
+        return render_template('update.html', friend_to_update=record_to_update,modelName=modelName, groups = groups, classes = classes, enrollments=enrollment_ids)
 
 @app.route('/')
 def index():
