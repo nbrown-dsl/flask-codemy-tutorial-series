@@ -8,9 +8,11 @@
 <br>
 <form action="/update/{{friend_to_update.id}}/{{modelName}}" METHOD = "POST">
     <input type="text" placeholder = "name" name = "name" value = "{{friend_to_update.name}}"><br>
+    
     {% if modelName == 'Groups' %}
     <input type=file name=file>
     {% endif %}
+
     {% if modelName == 'Friends' %}
     <label for="group">Group</label>
       <select id="group" class="form-control" name="group">
@@ -19,7 +21,7 @@
         <option value = "{{ group.id }}">{{ group.name }}</option>
         {% endfor %}
       </select>
-    {% endif %}<br>
+    <br>
     <label>Classes</label>    
         {% for class in classes %}
         <div class="form-check">
@@ -37,6 +39,14 @@
         </div>
         {% endfor %}
         <br>
+    {% endif %}
+
+    {% if modelName == 'ClassForm' %}
+    <label for="group">Teacher</label><br>
+    <input type="text" placeholder = "teacher" name = "teacher" value = "{{friend_to_update.teacher}}"><br>
+    <label for="group">Subject</label><br>
+    <input type="text" placeholder = "subject" name = "subject" value = "{{friend_to_update.subject}}"><br>
+    {% endif %}
     <input type="submit" value="Update" class="btn btn-primary">
 </form>
 <div>

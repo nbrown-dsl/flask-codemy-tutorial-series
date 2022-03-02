@@ -119,8 +119,11 @@ def update(id,modelName):
             for friendClass in friend_classes:
                 new_enrollment=Roll(friend_id=id, classform_id=friendClass)
                 db.session.add(new_enrollment)
-        
-        
+        if modelName == 'ClassForm':
+            record_to_update.teacher = request.form['teacher']
+            record_to_update.subject = request.form['subject']
+        if modelName == 'Groups':
+            record_to_update.filename = saveFile(request)
         
         try:
             db.session.commit()
@@ -168,18 +171,7 @@ def friends(modelName):
     elif modelName == "Groups":
         if request.method == "POST":
             group_name = request.form['name']
-            if 'file' not in request.files:
-                # flash('No file part')
-                return redirect(request.url)
-            file = request.files['file']
-            # If the user does not select a file, the browser submits an
-            # empty file without a filename.
-            if file.filename == '':
-                # flash('No selected file')
-                return redirect(request.url)
-            if file and allowed_file(file.filename):
-                filename = secure_filename(file.filename)
-                file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            filename = saveFile(request)
             new_group = Group(name=group_name, filename=filename)
                 #push to databse
             try:
@@ -249,3 +241,18 @@ def allowed_file(filename):
 def uploaded_file(filename):
     return send_from_directory(app.config['UPLOAD_FOLDER'],
                                filename)
+
+def saveFile(request):
+    if 'file' not in request.files:
+        # flash('No file part')
+        return redirect(request.url)
+    file = request.files['file']
+    # If the user does not select a file, the browser submits an
+    # empty file without a filename.
+    if file.filename == '':
+        # flash('No selected file')
+        return redirect(request.url)
+    if file and allowed_file(file.filename):
+        filename = secure_filename(file.filename)
+        file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+        return filename
