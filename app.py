@@ -100,6 +100,8 @@ def update(id,modelName):
         #if on list then checkbox checked
         for enroll in enrollments:
             enrollment_ids.append(enroll.classform_id)
+        return render_template('update.html', friend_to_update=record_to_update,modelName=modelName, groups = groups, classes = classes, enrollments=enrollment_ids)
+
     if modelName == 'Groups':
         record_to_update = Group.query.get_or_404(id)
     if modelName == 'ClassForm':
@@ -125,7 +127,7 @@ def update(id,modelName):
         except:
             return "problem updating"
     else:
-        return render_template('update.html', friend_to_update=record_to_update,modelName=modelName, groups = groups, classes = classes, enrollments=enrollment_ids)
+        return render_template('update.html', friend_to_update=record_to_update,modelName=modelName, groups = groups, classes = classes)
 
 @app.route('/')
 def index():

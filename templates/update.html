@@ -8,6 +8,9 @@
 <br>
 <form action="/update/{{friend_to_update.id}}/{{modelName}}" METHOD = "POST">
     <input type="text" placeholder = "name" name = "name" value = "{{friend_to_update.name}}"><br>
+    {% if modelName == 'Groups' %}
+    <input type=file name=file>
+    {% endif %}
     {% if modelName == 'Friends' %}
     <label for="group">Group</label>
       <select id="group" class="form-control" name="group">
