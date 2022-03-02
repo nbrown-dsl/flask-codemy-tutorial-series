@@ -11,9 +11,9 @@
     {% if modelName == 'Friends' %}
     <label for="group">Group</label>
       <select id="group" class="form-control" name="group">
-        <option selected>Choose...</option>
+        <option selected>Choose group...</option>
         {% for group in groups %}
-        <option >{{ group.name }}</option>
+        <option value = "{{ group.id }}">{{ group.name }}</option>
         {% endfor %}
       </select>
     {% endif %}
@@ -22,20 +22,40 @@
 </form>
 
  <br><br>
+ <table>
  {% if modelName == 'Friends' %}
-      {% for friend in friends %}
-      <h4> {{friend.name }} <a href="/update/{{friend.id }}/{{modelName}}" class="btn btn-secondary btn-sm">update</a>
-        <a href="/delete/{{friend.id }}/{{modelName}}" class="btn btn-outline-danger btn-sm">delete</a>
-      </h4>
+    <th>Name</th>
+    <th>Group</th>
+    {% for friend in friends %}
+    <tr> 
+       <td><h4> {{friend.name }}</h4></td>
+       <td> {{friend.group.name}}</td>
+       <td><a href="/update/{{friend.id }}/{{modelName}}" class="btn btn-secondary btn-sm">Update</a></td>
+       <td><a href="/delete/{{friend.id }}/{{modelName}}" class="btn btn-outline-danger btn-sm">Delete</a></td>
+    </tr>
       {% endfor %}
   {% else %}
+      <th>Name</th>
       {% for group in groups %}
-      <h4> {{group.name }} <a href="/update/{{group.id }}/{{modelName}}" class="btn btn-secondary btn-sm">update</a>
-        <a href="/delete/{{group.id }}/{{modelName}}" class="btn btn-outline-danger btn-sm">delete</a>
-      </h4>
+      <tr> 
+        <td><h4> {{group.name }}</h4> </td>
+        <td><a href="/update/{{group.id }}/{{modelName}}" class="btn btn-secondary btn-sm">Update</a></td>&nbsp;
+        <td><a href="/delete/{{group.id }}/{{modelName}}" class="btn btn-outline-danger btn-sm">Delete</a></td>&nbsp;
+        <td><p>
+          {% if group.people[0] %}
+            Members:
+            {% for friend in group.people %}
+            {{friend.name}},
+            {% endfor %}
+          {% endif %}
+        </p></td>
+      </tr>
       {% endfor %}
+      
 
  {% endif %}
+</table>
+
     </div>
     
 

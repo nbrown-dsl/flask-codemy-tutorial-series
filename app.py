@@ -8,7 +8,10 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///friends.db'
 #initialize database
 db = SQLAlchemy(app)
 
-#create database model
+app.run(debug=True)
+
+
+#create model class that can be mapped to database
 class Group(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(200),nullable=False)
@@ -26,7 +29,7 @@ class Friend(db.Model):
     group_id = db.Column(db.Integer, db.ForeignKey('group.id'),
         nullable=True)
 
-    #create function to return stringwhen we add something
+    #create function to return string when we create new instance
     def __repr__(self):
         return '<Name %r>' % self.id
 
@@ -54,19 +57,22 @@ def delete(id,modelName):
 
 @app.route('/update/<int:id>/<modelName>', methods=["POST","GET"])
 def update(id,modelName):
+    groups = Group.query.order_by(Group.date_created)
     if modelName == 'Friends':
         record_to_update = Friend.query.get_or_404(id)
     if modelName == 'Groups':
         record_to_update = Group.query.get_or_404(id)
     if request.method == "POST":
         record_to_update.name = request.form['name'] 
+        if modelName == 'Friends':
+            record_to_update.group_id = request.form['group'] 
         try:
             db.session.commit()
             return redirect(url_for('friends', modelName=modelName))
         except:
             return "problem updating"
     else:
-        return render_template('update.html', friend_to_update=record_to_update,modelName=modelName)
+        return render_template('update.html', friend_to_update=record_to_update,modelName=modelName, groups = groups)
 
 @app.route('/')
 def index():
@@ -88,7 +94,7 @@ def friends(modelName):
             friend_name = request.form['name']
             friend_group = request.form['group']
             new_friend = Friend(name=friend_name, group_id=friend_group)
-            #push to databse
+            #push to database
             try:
                 db.session.add(new_friend)
                 db.session.commit()
