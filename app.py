@@ -128,8 +128,8 @@ def update(id,modelName):
         try:
             db.session.commit()
             return redirect(url_for('friends', modelName=modelName))
-        except:
-            return "problem updating"
+        except Exception as e:
+            return "problem updating"+str(e)
     else:
         return render_template('update.html', friend_to_update=record_to_update,modelName=modelName, groups = groups, classes = classes, enrollments=enrollment_ids)
 
@@ -245,14 +245,14 @@ def uploaded_file(filename):
 def saveFile(request):
     if 'file' not in request.files:
         # flash('No file part')
-        return redirect(request.url)
+        filename  = ""
     file = request.files['file']
     # If the user does not select a file, the browser submits an
     # empty file without a filename.
     if file.filename == '':
         # flash('No selected file')
-        return redirect(request.url)
+        filename  = ""
     if file and allowed_file(file.filename):
         filename = secure_filename(file.filename)
         file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-        return filename
+    return filename
