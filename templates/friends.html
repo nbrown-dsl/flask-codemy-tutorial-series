@@ -6,6 +6,20 @@
       <div class='container'><h1>{{modelName}}</h1>
 
     <br>
+
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Add record</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+      
+      
+
 <form action="/friends/{{modelName}}" METHOD = "POST" enctype=multipart/form-data>
     <input type="text" placeholder = "name" name = "name"><br>
   {% if modelName == 'Groups' %}
@@ -39,8 +53,18 @@
   <br>
   {% endif %}
       <br>
-    <input type="submit" value="Add" class="btn btn-primary">
+    
+
+<div class="modal-footer">
+  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+  <input type="submit" value="Add" class="btn btn-primary">
+ 
 </form>
+
+</div></div>
+</div>
+</div>
+</div>
 
  <br><br>
  <table>
@@ -58,24 +82,33 @@
   {% endif %}
 
   {% if modelName == 'Groups' %}
-      
-      {% for group in groups %}
-      <tr>
-        <td><img src="{{url_for('static', filename='/uploads/'+group.filename)}}" width="100px"></td> 
-        <td><h4> {{group.name }}</h4> </td>
-        <td><a href="/update/{{group.id }}/{{modelName}}" class="btn btn-secondary btn-sm">Update</a></td>&nbsp;
-        <td><a href="/delete/{{group.id }}/{{modelName}}" class="btn btn-outline-danger btn-sm">Delete</a></td>&nbsp;
-        <td><p>
-          {% if group.people[0] %}
+  <div class="row row-cols-1 row-cols-md-4 g-4">
+{% for group in groups %}
+  
+    <div class="col">
+      <div class="card" style="width: 18rem;">
+        <img src="{{url_for('static', filename='/uploads/'+group.filename)}}" class="card-img-top" alt="...">
+        <div class="card-body">
+          <h5 class="card-title"> {{group.name }}</h5>
+          <p class="card-text">{% if group.people[0] %}
             Members:
             {% for friend in group.people %}
             {{friend.name}},
             {% endfor %}
-          {% endif %}
-        </p></td>
-      </tr>
-      {% endfor %}
-  {% endif %}
+          {% endif %}</p>
+        </div>
+        <div class="card-footer">
+          <a href="/update/{{group.id }}/{{modelName}}" class="btn btn-secondary btn-sm">Update</a>
+          <a href="/delete/{{group.id }}/{{modelName}}" class="btn btn-outline-danger btn-sm">Delete</a>
+        </div>
+      </div>
+    </div>
+    
+  
+     {% endfor %}
+    </div>
+  {% endif %}    
+      
  
   {% if modelName == 'ClassForm' %}
     <th>Name</th>
@@ -96,9 +129,11 @@
 </table>
 
     </div>
-    
+
 
    
   </body>
 </html>
+
+
 {% endblock %}
