@@ -21,36 +21,30 @@ class Base(db.Model):
     __abstract__ = True
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(200),nullable=False)
-    date_created = db.Column(db.DateTime, default = datetime.utcnow)
+
+    #create function to return string when we create new instance
+    def __repr__(self):
+        return '<Name %r>' % self.id
 
 #create model class that can be mapped to database
 class Group(Base):
     people = db.relationship('Friend', backref='group', lazy=True)
     filename = db.Column(db.String(200),nullable=True)
+    date_created = db.Column(db.DateTime, default = datetime.utcnow)
 
-    #create function to return string when we add something
-    def __repr__(self):
-        return '<Name %r>' % self.id
 
 class Friend(Base):
-    group_id = db.Column(db.Integer, db.ForeignKey('group.id'),
-        nullable=True)
-    
-    classes = db.relationship('ClassForm',
-                    secondary='rolls')
-    #create function to return string when we create new instance
-    def __repr__(self):
-        return '<Name %r>' % self.id
+    group_id = db.Column(db.Integer, db.ForeignKey('group.id'),nullable=True)
+    classes = db.relationship('ClassForm',secondary='rolls')
+    date_created = db.Column(db.DateTime, default = datetime.utcnow)
+
 
 class ClassForm(Base):
     subject = db.Column(db.String(200),nullable=False)
     teacher = db.Column(db.String(200),nullable=False)    
-    friends = db.relationship('Friend',
-                    secondary='rolls')
+    friends = db.relationship('Friend',secondary='rolls')
 
-    #create function to return string when we create new instance
-    def __repr__(self):
-        return '<Name %r>' % self.id
+    
 
 # helper model to create many to many relationship between friend and classform
 # however recommended to use table rather than model
