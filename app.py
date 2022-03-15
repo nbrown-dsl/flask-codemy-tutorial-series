@@ -16,12 +16,15 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///friends.db'
 #initialize database
 db = SQLAlchemy(app)
 
-
-#create model class that can be mapped to database
-class Group(db.Model):
+#create abstract base class below db.model
+class Base(db.Model):
+    __abstract__ = True
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(200),nullable=False)
     date_created = db.Column(db.DateTime, default = datetime.utcnow)
+
+#create model class that can be mapped to database
+class Group(Base):
     people = db.relationship('Friend', backref='group', lazy=True)
     filename = db.Column(db.String(200),nullable=True)
 
@@ -29,10 +32,7 @@ class Group(db.Model):
     def __repr__(self):
         return '<Name %r>' % self.id
 
-class Friend(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(200),nullable=False)
-    date_created = db.Column(db.DateTime, default = datetime.utcnow)
+class Friend(Base):
     group_id = db.Column(db.Integer, db.ForeignKey('group.id'),
         nullable=True)
     
@@ -42,9 +42,7 @@ class Friend(db.Model):
     def __repr__(self):
         return '<Name %r>' % self.id
 
-class ClassForm(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(200),nullable=False)
+class ClassForm(Base):
     subject = db.Column(db.String(200),nullable=False)
     teacher = db.Column(db.String(200),nullable=False)    
     friends = db.relationship('Friend',
@@ -54,7 +52,10 @@ class ClassForm(db.Model):
     def __repr__(self):
         return '<Name %r>' % self.id
 
-# helper table to create many to many relationship between friend and classform
+# helper model to create many to many relationship between friend and classform
+# however recommended to use table rather than model
+# https://flask-sqlalchemy.palletsprojects.com/en/2.x/models/#many-to-many-relationships
+
 class Roll(db.Model):
     __tablename__ = 'rolls'
     id = db.Column(db.Integer, primary_key=True)
