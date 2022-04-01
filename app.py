@@ -31,18 +31,31 @@ class Group(Base):
     people = db.relationship('Friend', backref='group', lazy=True)
     filename = db.Column(db.String(200),nullable=True)
     date_created = db.Column(db.DateTime, default = datetime.utcnow)
+    #this needs to match modelname passed in nav bar link
+    modelName = "Groups"
+
 
 
 class Friend(Base):
     group_id = db.Column(db.Integer, db.ForeignKey('group.id'),nullable=True)
     classes = db.relationship('ClassForm',secondary='rolls')
     date_created = db.Column(db.DateTime, default = datetime.utcnow)
+    #this needs to match modelname passed in nav bar link
+    modelName = "Friends"
+
+    def processForm(form):
+        friend_name = form['name']
+        friend_group = form['group']
+        new_friend = Friend(name=friend_name, group_id=friend_group)
+        return new_friend
+
 
 
 class ClassForm(Base):
     subject = db.Column(db.String(200),nullable=False)
     teacher = db.Column(db.String(200),nullable=False)    
     friends = db.relationship('Friend',secondary='rolls')
+    modelName = "ClassForm"
 
     
 
@@ -63,6 +76,12 @@ db.create_all()
 db.session.commit()
 
 subscribers = []
+
+#method to return class object from given modelname
+def returnClassObject(modelName):
+    arrayOfClasses = Base.__subclasses__()
+    #search array for matching class name and return Class object
+    return arrayOfClasses[1]
 
 @app.route('/delete/<int:id>/<modelName>')
 def delete(id,modelName):
@@ -145,10 +164,10 @@ def friends(modelName):
     title = modelName
     if modelName == "Friends":
         if request.method == "POST":
-            friend_name = request.form['name']
-            friend_group = request.form['group']
-            new_friend = Friend(name=friend_name, group_id=friend_group)
-            #push to database
+            #get class object for given model name
+            classObject = returnClassObject(modelName)
+            #create new instance of class object from form filed data
+            new_friend = classObject.processForm(request.form)
             try:
                 db.session.add(new_friend)
                 db.session.commit()
