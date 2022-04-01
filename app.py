@@ -24,7 +24,7 @@ class Base(db.Model):
 
     #create function to return string when we create new instance
     def __repr__(self):
-        return '<Name %r>' % self.id
+        return '<id %r>' % self.id
 
 #create model class that can be mapped to database
 class Group(Base):
